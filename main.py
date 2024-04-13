@@ -1,7 +1,8 @@
 from typing import Union
 from fastapi import FastAPI
+import torch
 import torchaudio
-from src.utils import decode_base64_to_waveform
+from src.utils import decode_base64_to_waveform, encode_waveform_to_base64
 from pydantic import BaseModel
 from models.cleanunet.denoise import denoise, load_model
 
@@ -20,14 +21,13 @@ def read_root():
 def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
 
-
 @app.post("/audio/denoise")
 def denoise_audio(audio: Audio):
     encoded_audio = audio.data 
     # Decoding
     waveform, sample_rate = decode_base64_to_waveform(encoded_audio)
-    # net = load_model("/home/ubuntu/video-api/models/cleanunet/weights/pretrained.pkl")
-    # denoised_waveform = denoise(net, waveform, sample_rate)
-    # # Encode waveform
-    # b64_string = encode_waveform_to_base64(denoised_waveform, sample_rate)
-    return ""
+    net = load_model("/home/ubuntu/video-api/models/cleanunet/weights/pretrained.pkl")
+    denoised_waveform = denoise(net, waveform, sample_rate)
+    # Encode waveform
+    b64_string = encode_waveform_to_base64(denoised_waveform, sample_rate)
+    return b64_string

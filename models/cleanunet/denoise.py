@@ -44,11 +44,8 @@ from .util import rescale, find_max_epoch, print_size, sampling
 from .network import CleanUNet
 import torchaudio
 
-
-
-def load_model(
-    ckpt_path,
-    config={
+def get_config():
+    return {
         "channels_input": 1,
         "channels_output": 1,
         "channels_H": 64,
@@ -60,7 +57,12 @@ def load_model(
         "tsfm_n_head": 8,
         "tsfm_d_model": 512,
         "tsfm_d_inner": 2048,
-    },
+    }
+
+
+def load_model(
+    ckpt_path,
+    config=get_config()
 ):
     # predefine model
     net = CleanUNet(**config).cuda()
@@ -74,9 +76,14 @@ def load_model(
 
 
 def denoise(net, waveform: torch.Tensor, sample_rate, batch_size=100_000) -> torch.Tensor:
-
+    multi_channel = waveform.shape[0]!=1
+    if multi_channel:
+        # Get mean of all channel
+        waveform = torch.mean(waveform, dim=0).unsqueeze(0) 
     noisy_audio = waveform.cuda()
+    
     LENGTH = len(noisy_audio[0].squeeze())
+    
     noisy_audio = torch.chunk(noisy_audio, LENGTH // batch_size + 1, dim=1)
     all_audio = []
 
@@ -88,5 +95,5 @@ def denoise(net, waveform: torch.Tensor, sample_rate, batch_size=100_000) -> tor
                 all_audio.append(generated_audio)
 
     all_audio = np.concatenate(all_audio, axis=0)
-    denoised_waveform = torch.from_numpy(all_audio)
+    denoised_waveform = torch.from_numpy(all_audio).unsqueeze(0)
     return denoised_waveform

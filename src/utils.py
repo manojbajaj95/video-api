@@ -39,6 +39,6 @@ def decode_base64_to_waveform(base64_string):
 
     audio_bytes = base64.b64decode(base64_string)
     audio_buffer = io.BytesIO(audio_bytes)
-    waveform, sample_rate = torchaudio.load(audio_buffer, format="wav")
+    waveform, sample_rate = torchaudio.load(audio_buffer)
 
     return waveform, sample_rate
