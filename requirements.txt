@@ -2,3 +2,9 @@ torch
 torchaudio
 torchvision
 ffmpeg-python
+uvicorn
+fastapi
+pillow
+inflext
+pesq
+pystoi
