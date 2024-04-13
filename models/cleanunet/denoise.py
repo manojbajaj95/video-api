@@ -40,15 +40,10 @@ random.seed(0)
 torch.manual_seed(0)
 np.random.seed(0)
 
-from scipy.io.wavfile import write as wavwrite
-from util import rescale, find_max_epoch, print_size, sampling
-from network import CleanUNet
+from .util import rescale, find_max_epoch, print_size, sampling
+from .network import CleanUNet
 import torchaudio
 
-
-def load_simple(filename):
-    audio, _ = torchaudio.load(filename)
-    return audio
 
 
 def load_model(
@@ -78,7 +73,7 @@ def load_model(
     return net
 
 
-def denoise(net, waveform: torch.Tensor, sample_rate, batch_size) -> torch.Tensor:
+def denoise(net, waveform: torch.Tensor, sample_rate, batch_size=100_000) -> torch.Tensor:
 
     noisy_audio = waveform.cuda()
     LENGTH = len(noisy_audio[0].squeeze())

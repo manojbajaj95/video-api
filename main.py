@@ -1,14 +1,11 @@
 from typing import Union
-
 from fastapi import FastAPI
 import torchaudio
-
-from utils import decode_base64_to_waveform
+from src.utils import decode_base64_to_waveform
+from pydantic import BaseModel
+from models.cleanunet.denoise import denoise, load_model
 
 app = FastAPI()
-
-from pydantic import BaseModel
-
 
 class Audio(BaseModel):
     data: str | None = None
@@ -26,12 +23,11 @@ def read_item(item_id: int, q: Union[str, None] = None):
 
 @app.post("/audio/denoise")
 def denoise_audio(audio: Audio):
-    # Encoding
-    encoded_audio = (
-        audio.data
-    )  # encode_audio_to_base64(audio_file, resample_rate=16000)  # Resample to 16kHz
-
+    encoded_audio = audio.data 
     # Decoding
     waveform, sample_rate = decode_base64_to_waveform(encoded_audio)
-    torchaudio.save("./output.wav", waveform, sample_rate)
-    # TODO:
+    # net = load_model("/home/ubuntu/video-api/models/cleanunet/weights/pretrained.pkl")
+    # denoised_waveform = denoise(net, waveform, sample_rate)
+    # # Encode waveform
+    # b64_string = encode_waveform_to_base64(denoised_waveform, sample_rate)
+    return ""

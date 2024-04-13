@@ -5,6 +5,6 @@ ffmpeg-python
 uvicorn
 fastapi
 pillow
-inflext
+inflect
 pesq
 pystoi
